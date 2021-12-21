@@ -15,13 +15,18 @@ class QuizBrain:
         self.cr_player = q_player
         self.end_game = False
 
+    def start_the_game(self):
+        self.reset_the_game()
+        while not self.check_end_game():
+            self.next_question()
+
     def reset_the_game(self):
         self.set_end_game(False)
         self.reset_player_counter()
+        self.reset_question_number()
 
     def check_last_question(self):
-        if self.question_number == self.question_list_length - 1:
-            self.question_number = 0
+        return self.question_number == self.question_list_length - 1
 
     def question_list_is_empty(self):
         if self.question_list_length == 0:
@@ -33,10 +38,16 @@ class QuizBrain:
 
     def check_end_game(self):
         if self.end_game:
-            print(f"The Game is over. Player: '{self.cr_player.name}' your score is: '{self.cr_player.guess_counter}'")
+            print(f"The Game is over. Player: '{self.cr_player.name}' "
+                  f"your score is: '{self.cr_player.guess_counter}/{self.question_list_length}'")
+            return True
+        return False
 
     def reset_player_counter(self):
         self.cr_player.guess_counter = 0
+
+    def reset_question_number(self):
+        self.question_number = 0
 
     def ask_player_answer(self, current_question):
         current_answer = ''
@@ -46,8 +57,11 @@ class QuizBrain:
 
     def check_player_answer(self, question):
         if self.cr_player.current_answer == question.answer.lower():
-            return True
-        return False
+            self.increase_guess_counter()
+            self.increase_question_number()
+        else:
+            print("Wrong answer. Sorry :( ")
+            self.set_end_game(True)
 
     def increase_guess_counter(self):
         self.cr_player.guess_counter += 1
@@ -61,16 +75,14 @@ class QuizBrain:
     def next_question(self):
         if self.question_list_is_empty():
             print("Question list is empty!")
+            self.set_end_game(True)
             return
         else:
-            self.check_last_question()
+            if self.check_last_question():
+                self.set_end_game(True)
             question = self.get_question()
             self.ask_player_answer(question)
-            if self.check_player_answer(question):
-                self.increase_guess_counter()
-                self.increase_question_number()
-            else:
-                print("Wrong answer. Sorry :( ")
-                self.set_end_game(True)
-                self.check_end_game()
+            self.check_player_answer(question)
+
+
 

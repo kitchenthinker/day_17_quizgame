@@ -17,5 +17,9 @@ while player_name == '':
 
 new_player = Player(player_name)
 QuizBrain = QuizBrain(question_bank, new_player)
-while not QuizBrain.end_game:
-    QuizBrain.next_question()
+Global_EndGame = False
+while not Global_EndGame:
+    QuizBrain.start_the_game()
+    TryAgain = input("Wanna try again? [Y, N]: ").lower()
+    if TryAgain != "y":
+        Global_EndGame = True
